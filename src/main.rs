@@ -28,6 +28,8 @@ enum Commands {
     Java(commands::java::Commands),
     #[command(alias = "md", subcommand)]
     Markdown(commands::markdown::Commands),
+    #[command(subcommand)]
+    Run(commands::run::Args),
 }
 
 #[tokio::main]
@@ -41,5 +43,6 @@ async fn main() -> Result<()> {
         Commands::Build(args) => commands::build::run(app, args).await,
         Commands::Java(args) => commands::java::run(app, args).await,
         Commands::Markdown(args) => commands::markdown::run(app, args).await,
+        Commands::Run(args) => commands::run::run(app, args).await,
     }
 }
