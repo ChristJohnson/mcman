@@ -1,10 +1,16 @@
-use serde::{Deserialize, Serialize};
 use std::{borrow::ToOwned, collections::HashMap, env};
+
+use serde::{Deserialize, Serialize};
+
+pub use preset_flags::*;
 
 use crate::api::utils::serde::*;
 
+
+
 mod preset_flags;
-pub use preset_flags::*;
+
+
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(default)]
@@ -35,6 +41,20 @@ pub struct ServerLauncher {
 }
 
 impl ServerLauncher {
+    
+    /// Automatically configure arguments for a server jar file, `exec`.
+    ///
+    /// # Arguments
+    ///
+    /// * `exec`: name of jar file to run
+    ///
+    /// returns: Vec<String, Global>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    ///
+    /// ```
     pub fn get_args(&self, exec: &str) -> Vec<String> {
         let mut args = self
             .jvm_args

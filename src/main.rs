@@ -1,8 +1,11 @@
 use std::sync::Arc;
 
 use anyhow::Result;
-use api::app::App;
 use clap::Parser;
+
+use api::app::App;
+
+
 
 mod api;
 mod commands;
@@ -28,7 +31,6 @@ enum Commands {
     Java(commands::java::Commands),
     #[command(alias = "md", subcommand)]
     Markdown(commands::markdown::Commands),
-    #[command(subcommand)]
     Run(commands::run::Args),
 }
 

@@ -1,40 +1,45 @@
 use std::{path::Path, sync::Arc};
-use std::process::{Command, Stdio};
-use anyhow::Result;
+use std::process::Command;
+
+use anyhow::{bail, Result};
 
 use crate::api::app::App;
+use crate::commands::run::Args;
+
+
 
 impl App {
-  pub async fn action_run_server(self: Arc<Self>, base: &Path) -> Result<()> {
+  pub async fn action_run_server(self: Arc<Self>, base: &Path, args: Args) ->
+  Result<()> {
     
-    if let Some(jar) = self.server.read().await.as_ref().map(|(_, server)| {
-      server.jar.clone()
-    }).flatten() {
-      println!("Running server jar");
-      // determine type of server
-      let server_type = &jar.server_type;
+    if let Some((path, srv)) = self.server.read().await.as_ref() {
+      println!("Running server at {}", path.display());
+      
+      let launcher = &srv.launcher;
+      
+      // it has to be this janky?
+      let jar_args: String = match &srv.jar {
+        None => bail!("[action_run_server] unable to determine server jar!"),
+        Some(j) => j,
+      }.get_execution_arguments().iter().flat_map(|p| p.chars())
+          .collect();
       
       // discover default execution arguments (i.e. pass these and server
       // will run)
-      let args = server_type.get_execution_arguments();
-      
-      // TODO: concatenate
+      // argument exec
+      let args = launcher.get_args(jar_args.as_str());
       
       // build server
       let mut server = Command::new("java")
           .args(args)
-          .stdin(Stdio::inherit())
-          .stdout(Stdio::inherit())
-          .stderr(Stdio::inherit())
           .spawn()?;
       
       // TODO: fork process (see std::process io practices)
       server.wait()?;
-      
-      todo!("execute server jar");
-      
+    } else {
+      bail!("[action_run_server] could not find server!");
     }
     
-    todo!();
+    Ok(())
   }
 }
